@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aks-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: aks-server
+  template:
+    metadata:
+      labels:
+        app: aks-server
+    spec:
+      nodeSelector:
+        "beta.kubernetes.io/os": linux
+      containers:
+      - name: aks-server
+        image: aksexamplecontainerregistry.azurecr.io/aks-server:v1
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 250m
+            memory: 256Mi
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aks-server
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+  selector:
+    app: aks-server
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aks-client
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: aks-client
+  template:
+    metadata:
+      labels:
+        app: aks-client
+    spec:
+      nodeSelector:
+        "beta.kubernetes.io/os": linux
+      containers:
+      - name: aks-client
+        image: aksexamplecontainerregistry.azurecr.io/aks-client:v1
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 250m
+            memory: 256Mi
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aks-client
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+  selector:
+    app: aks-client
